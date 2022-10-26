@@ -27,7 +27,6 @@ namespace Snake
                 Point p = new Point(x, y, sym);
                 pList.Add(p);  // Добавление координат в список точек
             }
-
-        }      
+        }
     }
 }
