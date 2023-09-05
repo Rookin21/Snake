@@ -31,6 +31,22 @@ namespace Snake
             Columns = columns;
             Grid = new GridValue[rows, columns];
             Dir = Direction.Right; // При старте игры - змея движется вправо
-        }           
+
+            AddSnake();
+        }      
+        /// <summary>
+        /// Добавление змейки на игровое поле
+        /// </summary>
+        private void AddSnake()
+        {
+            int r = Rows / 2; // Для добавления змеи в середину строки
+
+            // Цикл для запуск змеи длинной 3 клетки
+            for (int c = 1; c <= 3; c++)
+            {
+                Grid[r, c] = GridValue.Snake; // Начальное положение змеи на поле
+                _SnakePositions.AddFirst(new Position(r, c)); // Добавление положения в связный список
+            }
+        }
     }
 }
