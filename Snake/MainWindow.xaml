@@ -33,7 +33,7 @@
                          Width="400"
                          Height="400"
                          Background="{StaticResource GridBackgroundColor}">
-                
+ 
             </UniformGrid>
         </Border>
     </Grid>
