@@ -33,6 +33,7 @@ namespace Snake
             Dir = Direction.Right; // При старте игры - змея движется вправо
 
             AddSnake();
+            AddFood();
         }      
         /// <summary>
         /// Добавление змейки на игровое поле
@@ -47,6 +48,37 @@ namespace Snake
                 Grid[r, c] = GridValue.Snake; // Начальное положение змеи на поле
                 _SnakePositions.AddFirst(new Position(r, c)); // Добавление положения в связный список
             }
+        }
+
+        /// <summary>
+        /// Определение пустой ячейки
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<Position> EmptyPositions()
+        {
+            for (int r = 0;  r < Rows; r++)
+            {
+                for (int c = 0; c < Columns; c++)
+                {
+                    if (Grid[r,c] == GridValue.Empty) // Если ячейка пустая
+                    {
+                        yield return new Position(r, c); // Определяем возвращаемый элемент
+                    }
+                }
+            }
+        }
+
+        private void AddFood()
+        { 
+            List<Position> empty = new List<Position>(EmptyPositions()); // Лист с пустыми ячейками
+
+            if (empty.Count == 0) // Если нет пустых ячеек, то конец игры
+            {
+                return;
+            }
+
+            Position pos = empty[_Random.Next(empty.Count)]; // Перекладывание пустой ячейки в случайное значение
+            Grid[pos.Row, pos.Column] = GridValue.Food; // Установка положение еды в соответствующий массив
         }
     }
 }
