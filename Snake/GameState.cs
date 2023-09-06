@@ -139,5 +139,57 @@ namespace Snake
         {
             Dir = dir; // Перекладка свойства направления в параметр направления
         }
+
+        /// <summary>
+        /// Проверка выхода за границу поля
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <returns></returns>
+        private bool OutsideGrid(Position pos)
+        {
+            return pos.Row < 0 || pos.Row >= Rows || pos.Column < 0 || pos.Column >= Columns;
+        }
+
+        /// <summary>
+        /// В какую ячейку попадет голова при сдвиге
+        /// </summary>
+        /// <param name="newHeadPos"></param>
+        /// <returns></returns>
+        private GridValue WillHit(Position newHeadPos)
+        {
+            if(OutsideGrid(newHeadPos)) // Если выход за границу поля
+            {
+                return GridValue.Outside;
+            }
+
+            if (newHeadPos == TailPosition()) // При движении головы к последнему положению хвоста
+            {
+                return GridValue.Empty;
+            }
+            
+            return Grid[newHeadPos.Row, newHeadPos.Column];
+        }
+
+        public void Move()
+        {
+            Position newHeadPos = HeadPosition().Translate(Dir); // Новое местоположение головы
+            GridValue hit = WillHit(newHeadPos); // Проверка в какую ячейку сместиться голова
+
+            if (hit == GridValue.Outside || hit == GridValue.Snake) // Если змея вышла за границу поля или задела свое тело
+            {
+                GameOver = true; // Конец игры
+            }
+            else if (hit == GridValue.Empty) // Если сдвиг произошел на пустую ячейку
+            {
+                RemoveTail(); // Удаление хвоста
+                AddHead(newHeadPos); // Перенос головы в заданном направлении
+            }
+            else if (hit == GridValue.Food) // Если сдвиг произошел на ячейку с едой
+            {
+                AddHead(newHeadPos); // Увеличиваем длину тела, посредством добавления новой головы
+                Score++; // Увеличиваем счет
+                AddFood();
+            }
+        }
     }
 }
