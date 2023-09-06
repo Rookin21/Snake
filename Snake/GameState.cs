@@ -8,7 +8,7 @@ namespace Snake
         public int Rows { get; } // Строки
         public int Columns { get; } // Столбцы
         public GridValue[,] Grid { get; } // Размер игрового поля
-        public Direction Dir { get; } // Направление куда пойдет змея
+        public Direction Dir { get; private set; } // Направление куда пойдет змея
         public int Score { get; private set; } // Счет
         public bool GameOver {  get; private set; } // Флаг окончания игры
 
@@ -109,6 +109,35 @@ namespace Snake
         public IEnumerable<Position> SnakePositions()
         {
             return _SnakePositions;
+        }
+
+        /// <summary>
+        /// Удлинение длины тела змейки, путем добавления новой головы
+        /// </summary>
+        /// <param name="pos"></param>
+        private void AddHead(Position pos)
+        {
+            _SnakePositions.AddFirst(pos); 
+            Grid[pos.Row, pos.Column] = GridValue.Snake;
+        }
+
+        /// <summary>
+        /// Удаление хвоста
+        /// </summary>
+        private void RemoveTail()
+        {
+            Position tail = _SnakePositions.Last.Value; // Определение положение хвоста
+            Grid[tail.Row, tail.Column] = GridValue.Empty; // Очищаем эту ячейку
+            _SnakePositions.RemoveLast(); // Удаляем из списка
+        }
+
+        /// <summary>
+        /// Изменение направления
+        /// </summary>
+        /// <param name="dir"></param>
+        public void ChangeDiretion(Direction dir)
+        {
+            Dir = dir; // Перекладка свойства направления в параметр направления
         }
     }
 }
