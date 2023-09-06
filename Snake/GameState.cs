@@ -68,17 +68,47 @@ namespace Snake
             }
         }
 
+        /// <summary>
+        /// Расположение
+        /// </summary>
         private void AddFood()
         { 
             List<Position> empty = new List<Position>(EmptyPositions()); // Лист с пустыми ячейками
 
-            if (empty.Count == 0) // Если нет пустых ячеек, то конец игры
+            if (empty.Count == 0) // Если нет пустых ячеек для еды
             {
                 return;
             }
 
             Position pos = empty[_Random.Next(empty.Count)]; // Перекладывание пустой ячейки в случайное значение
             Grid[pos.Row, pos.Column] = GridValue.Food; // Установка положение еды в соответствующий массив
+        }
+
+        /// <summary>
+        /// Определение местоположения головы
+        /// </summary>
+        /// <returns></returns>
+        public Position HeadPosition()
+        {
+            return _SnakePositions.First.Value;
+        }
+
+        /// <summary>
+        /// Определение местоположения хвоста
+        /// </summary>
+        /// <returns></returns>
+        public Position TailPosition()
+        {
+            return _SnakePositions.Last.Value;
+        }
+
+        /// <summary>
+        /// Определение местоположения тела
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<Position> SnakePositions()
+        {
+            return _SnakePositions;
         }
     }
 }
