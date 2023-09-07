@@ -39,9 +39,10 @@ namespace Snake
             gameState = new GameState(rows, cols);
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Draw();
+            await GameLoop();
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -65,6 +66,20 @@ namespace Snake
                 case Key.Down:
                     gameState.ChangeDiretion(Direction.Down);
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Реализация движения змейки
+        /// </summary>
+        /// <returns></returns>
+        private async Task GameLoop()
+        {
+            while (!gameState.GameOver) // Пока не закончится игра
+            {
+                await Task.Delay(100); // Для скорости игры
+                gameState.Move();
+                Draw();
             }
         }
 
