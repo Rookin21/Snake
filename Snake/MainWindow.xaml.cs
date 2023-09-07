@@ -43,6 +43,7 @@ namespace Snake
         private async Task RunGame()
         {
             Draw();
+            await ShowCoundDown();
             Overlay.Visibility = Visibility.Hidden; // Скрываем текст после запуска игры
             await GameLoop();
         }
@@ -150,6 +151,15 @@ namespace Snake
                     GridValue gridVal = gameState.Grid[r, c]; // Получаем значение ячейки на конкретной позиции
                     gridImages[r, c].Source = gridValToImage[gridVal]; // Вызов соответствующей картинки из словаря
                 }
+            }
+        }
+
+        private async Task ShowCoundDown()
+        {
+            for (int i = 3; i >= 1; i--)
+            {
+                OverlayText.Text = i.ToString();
+                await Task.Delay(500);
             }
         }
     }
