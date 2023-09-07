@@ -31,6 +31,7 @@ namespace Snake
         private readonly int rows = 15, cols = 15; // количество рядов и столбцов
         private readonly Image[,] gridImages; // Массив для вывода картинок
         private GameState gameState; // Вызов класса GameState
+        private bool gameRunning; // Флаг начала игры
 
         public MainWindow()
         {
@@ -39,10 +40,31 @@ namespace Snake
             gameState = new GameState(rows, cols);
         }
 
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        private async Task RunGame()
         {
             Draw();
+            Overlay.Visibility = Visibility.Hidden; // Скрываем текст после запуска игры
             await GameLoop();
+        }
+
+        /// <summary>
+        /// Метод для однократного нажатия кнопки в начале игры
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (Overlay.Visibility == Visibility.Visible) // Если надпись видима, то передаем событие
+            {
+                e.Handled = true;
+            }
+
+            if (!gameRunning)
+            {
+                gameRunning = true;
+                await RunGame();
+                gameRunning = false;
+            }
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
