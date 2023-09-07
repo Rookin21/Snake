@@ -183,6 +183,19 @@ namespace Snake
             image.RenderTransform = new RotateTransform(rotation); // Поворот картинки на нужный угол
         }
 
+        private async Task DrawDeadSnake()
+        {
+            List<Position> positions = new List<Position>(gameState.SnakePositions()); // Список, который будет содержать все позиции змеи
+
+            for (int i = 0; i < positions.Count; i++) // Сколько итераций - столько и позиций
+            {
+                Position pos = positions[i];
+                ImageSource source = (i == 0) ? Images.DeadHead : Images.DeadBody; // Если 0, то картинки мертвой головы и тела
+                gridImages[pos.Row, pos.Column].Source = source; // Конкретная картинка - под конкретную позицию
+                await Task.Delay(50);
+            }
+        }
+
         /// <summary>
         /// Обратный отсчет
         /// </summary>
@@ -202,6 +215,7 @@ namespace Snake
         /// <returns></returns>
         private async Task ShowGameOver()
         {
+            await DrawDeadSnake();
             await Task.Delay(1000);
             Overlay.Visibility = Visibility.Visible;
             OverlayText.Text = "PRESS ANY KEY TO START";
