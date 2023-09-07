@@ -28,6 +28,17 @@ namespace Snake
             { GridValue.Food, Images.Food }, // Если ячейка со едой, то картинка "Food" 
         };
 
+        /// <summary>
+        /// Повороты головы при движении в определенном направлении
+        /// </summary>
+        private readonly Dictionary<Direction, int> dirToRotation = new()
+        {
+            { Direction.Up, 0 },
+            { Direction.Right, 90 },
+            { Direction.Down, 180 },
+            { Direction.Left, 270 }
+        };
+
         private readonly int rows = 15, cols = 15; // количество рядов и столбцов
         private readonly Image[,] gridImages; // Массив для вывода картинок
         private GameState gameState; // Вызов класса GameState
@@ -126,7 +137,8 @@ namespace Snake
 
                     Image image = new Image
                     {
-                        Source = Images.Empty // Изначально будет пустая картинка
+                        Source = Images.Empty, // Изначально будет пустая картинка
+                        RenderTransformOrigin = new Point(0.5, 0.5) // Центрирование картинок для избавления от бага со смещением
                     };
 
                     images[r, c] = image; // Складываем эту картинку в массив
@@ -140,6 +152,7 @@ namespace Snake
         private void Draw()
         {
             DrawGrid();
+            DrawSnakeHead();
             ScoreText.Text = $"SCORE {gameState.Score}";
         }
 
@@ -152,8 +165,22 @@ namespace Snake
                 { 
                     GridValue gridVal = gameState.Grid[r, c]; // Получаем значение ячейки на конкретной позиции
                     gridImages[r, c].Source = gridValToImage[gridVal]; // Вызов соответствующей картинки из словаря
+                    gridImages[r, c].RenderTransform = Transform.Identity; // Идентифицирует позицию с головой для поворота только этой ячейки
                 }
             }
+        }
+
+        /// <summary>
+        /// Добавление головы змейки
+        /// </summary>
+        private void DrawSnakeHead()
+        {
+            Position headPos = gameState.HeadPosition(); // Позиция головы
+            Image image = gridImages[headPos.Row, headPos.Column]; // Ориентация головы по позиции
+            image.Source = Images.Head; // Перекладка источника и картинки
+
+            int rotation = dirToRotation[gameState.Dir]; // Получение из словаря угла поворота головы
+            image.RenderTransform = new RotateTransform(rotation); // Поворот картинки на нужный угол
         }
 
         /// <summary>
