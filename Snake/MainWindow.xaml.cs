@@ -46,6 +46,8 @@ namespace Snake
             await ShowCoundDown();
             Overlay.Visibility = Visibility.Hidden; // Скрываем текст после запуска игры
             await GameLoop();
+            await ShowGameOver();
+            gameState = new GameState(rows, cols);
         }
 
         /// <summary>
@@ -154,6 +156,10 @@ namespace Snake
             }
         }
 
+        /// <summary>
+        /// Обратный отсчет
+        /// </summary>
+        /// <returns></returns>
         private async Task ShowCoundDown()
         {
             for (int i = 3; i >= 1; i--)
@@ -161,6 +167,17 @@ namespace Snake
                 OverlayText.Text = i.ToString();
                 await Task.Delay(500);
             }
+        }
+
+        /// <summary>
+        /// Конец игры
+        /// </summary>
+        /// <returns></returns>
+        private async Task ShowGameOver()
+        {
+            await Task.Delay(1000);
+            Overlay.Visibility = Visibility.Visible;
+            OverlayText.Text = "PRESS ANY KEY TO START";
         }
     }
 }
