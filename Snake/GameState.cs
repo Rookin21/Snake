@@ -10,14 +10,15 @@ namespace Snake
         public GridValue[,] Grid { get; } // Размер игрового поля
         public Direction Dir { get; private set; } // Направление куда пойдет змея
         public int Score { get; private set; } // Счет
-        public bool GameOver {  get; private set; } // Флаг окончания игры
+        public bool GameOver { get; private set; } // Флаг окончания игры
 
         /// <summary>
         /// Связный список для определения пространства, занимаемое змее. 
         /// Связный список используется по той причине, что требуется удалять последний элемент и добавлять первый. 
         /// Первый элемент голова. Последний хвост.
         /// </summary>
-        private readonly LinkedList<Position> _SnakePositions = new LinkedList<Position>();  
+        private readonly LinkedList<Position> _SnakePositions = new LinkedList<Position>();
+        private readonly LinkedList<Direction> _DirChanges = new LinkedList<Direction>();
         private readonly Random _Random = new Random(); // Требуется для расположения еды
 
         /// <summary>
@@ -34,7 +35,7 @@ namespace Snake
 
             AddSnake();
             AddFood();
-        }      
+        }
         /// <summary>
         /// Добавление змейки на игровое поле
         /// </summary>
@@ -56,11 +57,11 @@ namespace Snake
         /// <returns></returns>
         private IEnumerable<Position> EmptyPositions()
         {
-            for (int r = 0;  r < Rows; r++)
+            for (int r = 0; r < Rows; r++)
             {
                 for (int c = 0; c < Columns; c++)
                 {
-                    if (Grid[r,c] == GridValue.Empty) // Если ячейка пустая
+                    if (Grid[r, c] == GridValue.Empty) // Если ячейка пустая
                     {
                         yield return new Position(r, c); // Определяем возвращаемый элемент
                     }
@@ -72,7 +73,7 @@ namespace Snake
         /// Расположение
         /// </summary>
         private void AddFood()
-        { 
+        {
             List<Position> empty = new List<Position>(EmptyPositions()); // Лист с пустыми ячейками
 
             if (empty.Count == 0) // Если нет пустых ячеек для еды
@@ -117,7 +118,7 @@ namespace Snake
         /// <param name="pos"></param>
         private void AddHead(Position pos)
         {
-            _SnakePositions.AddFirst(pos); 
+            _SnakePositions.AddFirst(pos);
             Grid[pos.Row, pos.Column] = GridValue.Snake;
         }
 
@@ -132,12 +133,47 @@ namespace Snake
         }
 
         /// <summary>
+        /// Последнее направление движения
+        /// </summary>
+        /// <returns></returns>
+        private Direction GetLastDirection()
+        {
+            if (_DirChanges.Count == 0) // Если буфер пуст
+            {
+                return Dir; // Возвращает текуще значение
+            }
+
+            return _DirChanges.Last.Value; // Возвращает последнее направление движения
+        }
+
+        /// <summary>
+        /// Возможно ли осуществить ход по определенному направлению
+        /// </summary>
+        /// <param name="newDir"></param>
+        /// <returns></returns>
+        private bool CanChangeDirection(Direction newDir)
+        {
+            if (_DirChanges.Count == 2) // Если поступила команда на два направления одновременно
+            {
+                return false;
+            }
+
+            Direction lastDir = GetLastDirection(); // Последнее направление
+            return newDir != lastDir && newDir != lastDir.Opposite(); // Если последнее направление не совпадает с новым и не противоположное направление
+            
+        }
+
+        /// <summary>
         /// Изменение направления
         /// </summary>
         /// <param name="dir"></param>
         public void ChangeDiretion(Direction dir)
         {
-            Dir = dir; // Перекладка свойства направления в параметр направления
+            // Если есть возможность поменять движение
+            if (CanChangeDirection(dir))
+            {
+                _DirChanges.AddLast(dir);
+            }         
         }
 
         /// <summary>
@@ -157,7 +193,7 @@ namespace Snake
         /// <returns></returns>
         private GridValue WillHit(Position newHeadPos)
         {
-            if(OutsideGrid(newHeadPos)) // Если выход за границу поля
+            if (OutsideGrid(newHeadPos)) // Если выход за границу поля
             {
                 return GridValue.Outside;
             }
@@ -166,12 +202,19 @@ namespace Snake
             {
                 return GridValue.Empty;
             }
-            
+
             return Grid[newHeadPos.Row, newHeadPos.Column];
         }
 
         public void Move()
         {
+            // Проверка на наличие команды на смену направления
+            if (_DirChanges.Count > 0)
+            {
+                Dir = _DirChanges.First.Value; // Меняем направление
+                _DirChanges.RemoveFirst(); // Очищаем буфер
+            }
+
             Position newHeadPos = HeadPosition().Translate(Dir); // Новое местоположение головы
             GridValue hit = WillHit(newHeadPos); // Проверка в какую ячейку сместиться голова
 
